@@ -1,0 +1,64 @@
+1. "List all tournaments along with the winning team’s name."
+
+SELECT t.tournament_name, tm.team_name
+FROM Tournament t
+JOIN TournamentResults tr ON t.tournament_id = tr.tournament_id
+JOIN Team tm ON tr.team_id = tm.team_id
+WHERE tr.placement = 1;
+
+('Battle Royale Championship', 'Warriors')
+('Fantasy Quest Finals', 'Legends')
+
+2. Find the most recent match and its winner.
+
+SELECT m.match_date, tm.team_name AS winner
+FROM Match m
+JOIN Team tm ON m.winner_team_id = tm.team_id
+ORDER BY m.match_date DESC
+LIMIT 1;
+
+('2025-03-02 16:00:00', 'Legends')
+
+3. Get the number of tournaments each team has won.
+
+SELECT tm.team_name, COUNT(tr.tournament_id) AS tournaments_won
+FROM TournamentResults tr
+JOIN Team tm ON tr.team_id = tm.team_id
+WHERE tr.placement = 1
+GROUP BY tm.team_name;
+
+('Warriors', 1)
+('Legends', 1)
+
+4. Find all players who have participated in at least one match.
+
+SELECT DISTINCT u.username
+FROM User u
+JOIN TeamMembership tm ON u.user_id = tm.user_id
+JOIN Match m ON tm.team_id = m.team1_id OR tm.team_id = m.team2_id;
+
+('PlayerOne')
+('ProGamer')
+('NoobMaster')
+
+5. List all messages sent by members of a specific team (e.g., "Warriors").
+
+SELECT u.username, m.message_content, m.sent_at
+FROM Message m
+JOIN User u ON m.user_id = u.user_id
+JOIN TeamMembership tm ON u.user_id = tm.user_id
+JOIN Team t ON tm.team_id = t.team_id
+WHERE t.team_name = 'Warriors';
+
+('PlayerOne', 'Let’s win this tournament!', '2025-01-21 12:00:00')
+
+6. Find the skill level of each player and their team name.
+
+SELECT u.username, u.skill_level, t.team_name
+FROM User u
+JOIN TeamMembership tm ON u.user_id = tm.user_id
+JOIN Team t ON tm.team_id = t.team_id;
+
+('PlayerOne', 'Advanced', 'Warriors')
+('ProGamer', 'Pro', 'Warriors')
+('NoobMaster', 'Beginner', 'Legends')
